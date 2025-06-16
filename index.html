@@ -1,0 +1,1696 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FKKP - Forum Kerukunan Kebalen Peduli</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --tertiary-gradient: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            --accent-color: #ffd700;
+            --text-dark: #333;
+            --text-light: #666;
+            --white: #ffffff;
+            --shadow: 0 10px 30px rgba(0,0,0,0.1);
+            --shadow-hover: 0 20px 40px rgba(0,0,0,0.2);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --border-radius: 15px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--primary-gradient);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .loading-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loader {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid var(--white);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Scroll Progress Bar */
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 3px;
+            background: var(--accent-color);
+            z-index: 1001;
+            transition: width 0.1s ease;
+        }
+
+        /* Back to Top Button */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: var(--primary-gradient);
+            color: var(--white);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            z-index: 1000;
+            box-shadow: var(--shadow);
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        /* Navbar */
+        .navbar {
+            background: var(--primary-gradient);
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            backdrop-filter: blur(10px);
+        }
+
+        .navbar.scrolled {
+            background: rgba(102, 126, 234, 0.95);
+            backdrop-filter: blur(20px);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            color: var(--primary-gradient);
+            box-shadow: var(--shadow);
+        }
+
+        .logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;  /* Biar penuh tanpa distorsi */
+            border-radius: 50%; /* Biar gambar juga bulat */
+        }
+
+        .logo h2 {
+            color: var(--white);
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+        }
+
+        .nav-links a::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: var(--accent-color);
+            transition: var(--transition);
+            transform: translateX(-50%);
+        }
+
+        .nav-links a:hover::before {
+            width: 80%;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-color);
+            background: rgba(255,255,255,0.1);
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 4px;
+            padding: 10px;
+            border-radius: 5px;
+            transition: var(--transition);
+        }
+
+        .hamburger:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 5px;
+            background: var(--white);
+            transition: var(--transition);
+            transform-origin: center;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(6px, 6px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(8px, -8px);
+        }
+
+        .mobile-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background: rgba(102, 126, 234, 0.98);
+            backdrop-filter: blur(20px);
+            transform: translateY(-100%);
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+        }
+
+        .mobile-menu.active {
+            transform: translateY(0);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .mobile-menu a {
+            display: block;
+            color: var(--white);
+            text-decoration: none;
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        .mobile-menu a:hover {
+            background: rgba(255,255,255,0.1);
+            padding-left: 3rem;
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            background: var(--primary-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: var(--white);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><path fill="rgba(255,255,255,0.1)" d="M0,300 Q300,100 600,300 T1200,300 L1200,600 L0,600 Z"/></svg>') no-repeat center bottom;
+            background-size: cover;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            padding: 0 2rem;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 1s ease forwards 0.5s;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 1s ease forwards 0.7s;
+        }
+
+        .hero-btn {
+            background: var(--accent-color);
+            color: var(--text-dark);
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 1s ease forwards 0.9s;
+            box-shadow: var(--shadow);
+        }
+
+        .hero-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+            background: #ffed4e;
+        }
+
+        /* Main Content */
+        main {
+            margin-top: 0;
+        }
+
+        /* Section Styling */
+        .section {
+            padding: 5rem 0;
+            position: relative;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* About Section */
+        .about {
+            background: linear-gradient(135deg, #f8f9ff 0%, #e6f0ff 100%);
+        }
+
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .about-text h2 {
+            font-size: 2.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-dark);
+            font-weight: 700;
+        }
+
+        .about-text p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+            color: var(--text-light);
+        }
+
+        .about-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1.5rem;
+            background: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .stat-item:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #667eea;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .about-image {
+            position: relative;
+        }
+
+        .about-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .about-image:hover img {
+            transform: scale(1.05);
+        }
+
+        /* Structure Section */
+        .structure {
+            background: var(--white);
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.8rem;
+            margin-bottom: 4rem;
+            color: var(--text-dark);
+            font-weight: 700;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            width: 60px;
+            height: 4px;
+            background: var(--accent-color);
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+
+        .structure-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .structure-card {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: 2.5rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .structure-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary-gradient);
+        }
+
+        .structure-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        
+        .structure-card .icon {
+            width: 120px;
+            height: 120px;
+            background: none;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+            color: var(--white);
+            transition: var(--transition);
+        }
+
+        .structure-card .icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* isi lingkaran penuh, wajah tetap proporsional */
+            display: block;
+        }
+        
+        .structure-card:hover .icon {
+            transform: scale(1.1) rotate(10deg);
+        }
+
+
+        .structure-card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+
+        .structure-card p {
+            font-size: 1rem;
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        /* Activities Section */
+        .activities {
+            background: var(--secondary-gradient);
+            color: var(--white);
+        }
+
+        .activities .section-title {
+            color: var(--white);
+        }
+
+        .activities .section-title::after {
+            background: var(--white);
+        }
+
+        .activities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .activity-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            background: var(--white);
+            height: 300px;
+        }
+
+        .activity-item:hover {
+            transform: scale(1.03);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .activity-item img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .activity-item:hover img {
+            transform: scale(1.1);
+        }
+
+        .activity-content {
+            padding: 1.5rem;
+            background: var(--white);
+            color: var(--text-dark);
+            height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .activity-content h4 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .activity-content p {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        /* Contact Section */
+        .contact {
+            background: var(--tertiary-gradient);
+            color: var(--white);
+        }
+
+        .contact .section-title {
+            color: var(--white);
+        }
+
+        .contact .section-title::after {
+            background: var(--white);
+        }
+
+        .contact-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+        }
+
+        .contact-info h3 {
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
+            font-weight: 600;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            transition: var(--transition);
+        }
+
+        .contact-item:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateX(10px);
+        }
+
+        .contact-item i {
+            font-size: 1.3rem;
+            color: var(--accent-color);
+            width: 25px;
+        }
+
+        .contact-form {
+            background: rgba(255,255,255,0.1);
+            padding: 2.5rem;
+            border-radius: var(--border-radius);
+            backdrop-filter: blur(10px);
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            font-size: 1rem;
+            background: rgba(255,255,255,0.1);
+            color: var(--white);
+            transition: var(--transition);
+            backdrop-filter: blur(5px);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            background: rgba(255,255,255,0.2);
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: rgba(255,255,255,0.7);
+        }
+
+        .form-group textarea {
+            height: 120px;
+            resize: vertical;
+        }
+
+        .submit-btn {
+            background: var(--accent-color);
+            color: var(--text-dark);
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+            box-shadow: var(--shadow);
+        }
+
+        .submit-btn:hover {
+            background: #ffed4e;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        /* Footer */
+        .footer {
+            background: #1a1a1a;
+            color: var(--white);
+            text-align: center;
+            padding: 3rem 0;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h4 {
+            margin-bottom: 1rem;
+            color: var(--accent-color);
+        }
+
+        .footer-section p,
+        .footer-section a {
+            color: #ccc;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-section a:hover {
+            color: var(--accent-color);
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-links a {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 1.2rem;
+            transition: var(--transition);
+        }
+
+        .social-links a:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #333;
+            padding-top: 2rem;
+            color: #999;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .slide-left {
+            opacity: 0;
+            transform: translateX(-50px);
+            transition: all 0.8s ease;
+        }
+
+        .slide-left.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .slide-right {
+            opacity: 0;
+            transform: translateX(50px);
+            transition: all 0.8s ease;
+        }
+
+        .slide-right.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .hero h1 {
+                font-size: 3rem;
+            }
+            
+            .about-content,
+            .contact-content {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+
+            .activities-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hamburger {
+                display: flex;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            .section-title {
+                font-size: 2.2rem;
+            }
+
+            .about-text h2 {
+                font-size: 2.2rem;
+            }
+
+            .about-stats {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .structure-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .activities-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-container {
+                padding: 0 1rem;
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+
+            .section {
+                padding: 3rem 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .section-title {
+                font-size: 1.8rem;
+            }
+
+            .about-text h2 {
+                font-size: 1.8rem;
+            }
+
+            .back-to-top {
+                bottom: 20px;
+                right: 20px;
+                width: 45px;
+                height: 45px;
+            }
+        }
+
+        /* Utility Classes */
+        .text-center { text-align: center; }
+        .mb-1 { margin-bottom: 1rem; }
+        .mb-2 { margin-bottom: 2rem; }
+        .mt-1 { margin-top: 1rem; }
+        .mt-2 { margin-top: 2rem; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-gradient);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #5a67d8;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loader"></div>
+    </div>
+
+    <!-- Scroll Progress Bar -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+
+    <!-- Back to Top Button -->
+    <button class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Navbar -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="logo" onclick="scrollToTop()">
+                <div class="logo-icon">
+                    <img src="./img/Screenshot 2025-06-16 090019.png" style="width: auto;">
+                </div>
+                <h2>FKKP</h2>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#home">Beranda</a></li>
+                <li><a href="#about">Tentang</a></li>
+                <li><a href="#structure">Struktur</a></li>
+                <li><a href="#activities">Kegiatan</a></li>
+                <li><a href="#contact">Kontak</a></li>
+            </ul>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <div class="mobile-menu" id="mobileMenu">
+                <a href="#home">Beranda</a>
+                <a href="#about">Tentang</a>
+                <a href="#structure">Struktur</a>
+                <a href="#activities">Kegiatan</a>
+                <a href="#contact">Kontak</a>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <!-- Hero Section -->
+        <section id="home" class="hero">
+            <div class="hero-content">
+                <h1>Forum Kerukunan Kebalen Peduli</h1>
+                <p>Membangun kerukunan dan kepedulian masyarakat Kebalen melalui gotong royong dan persaudaraan yang harmonis</p>
+                <a href="#about" class="hero-btn">Pelajari Lebih Lanjut</a>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="about section">
+            <div class="container">
+                <div class="about-content">
+                    <div class="about-text slide-left">
+                        <h2>Tentang FKKP</h2>
+                        <p>Forum Kerukunan Kebalen Peduli (FKKP) adalah organisasi yang berkomitmen untuk membangun kerukunan dan kepedulian di lingkungan Kebalen. Kami hadir sebagai wadah untuk mempersatukan masyarakat dalam berbagai kegiatan sosial, budaya, dan keagamaan.</p>
+                        <p>Dengan semangat gotong royong dan persaudaraan, FKKP terus berupaya menciptakan lingkungan yang harmonis, sejahtera, dan peduli terhadap sesama. Kami percaya bahwa melalui kerjasama dan kepedulian bersama, kita dapat membangun komunitas yang lebih baik.</p>
+                        <div class="about-stats">
+                            <div class="stat-item">
+                                <span class="stat-number" data-target="20">0</span>
+                                <span class="stat-label">Anggota Aktif</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number" data-target="10">0</span>
+                                <span class="stat-label">Kegiatan Per Tahun</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number" data-target="3">0</span>
+                                <span class="stat-label">Tahun Berkarya</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="about-image slide-right">
+                        <img src="./img/Screenshot 2025-06-16 090019.png" alt="FKKP Community">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Structure Section -->
+        <section id="structure" class="structure section">
+            <div class="container">
+                <h2 class="section-title fade-in">Struktur Organisasi FKKP</h2>
+                <div class="structure-grid">
+                    <div class="structure-card fade-in" data-delay="100">
+                        <div class="icon">
+                              <img src="./img/WhatsApp Image 2025-06-14 at 19.37.50_f647fd21.jpg" alt="Ketua">
+                        </div>
+                        <h3>Ketua</h3>
+                        <p>Memimpin dan mengkoordinasikan seluruh kegiatan organisasi dengan visi dan misi yang jelas</p>
+                    </div>
+                    <div class="structure-card fade-in" data-delay="200">
+                        <div class="icon">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <h3>Wakil Ketua</h3>
+                        <p>Membantu ketua dalam menjalankan tugas organisasi dan mengambil keputusan strategis</p>
+                    </div>
+                    <div class="structure-card fade-in" data-delay="300">
+                        <div class="icon">
+                            <i class="fas fa-clipboard-list"></i>
+                        </div>
+                        <h3>Sekretaris</h3>
+                        <p>Mengelola administrasi, dokumentasi, dan korespondensi organisasi</p>
+                    </div>
+                    <div class="structure-card fade-in" data-delay="400">
+                        <div class="icon">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <h3>Bendahara</h3>
+                        <p>Mengelola keuangan, aset, dan pelaporan finansial organisasi</p>
+                    </div>
+                    <div class="structure-card fade-in" data-delay="500">
+                        <div class="icon">
+                            <i class="fas fa-running"></i>
+                        </div>
+                        <h3>Divisi Olahraga & Budaya</h3>
+                        <p>Mengorganisir kegiatan olahraga dan pelestarian budaya lokal</p>
+                    </div>
+                    <div class="structure-card fade-in" data-delay="600">
+                        <div class="icon">
+                            <i class="fas fa-pray"></i>
+                        </div>
+                        <h3>Divisi Kerohanian & Keagamaan</h3>
+                        <p>Menyelenggarakan kegiatan spiritual dan keagamaan untuk memperkuat iman</p>
+                    </div>
+                    <div class="structure-card fade-in" data-delay="700">
+                        <div class="icon">
+                            <i class="fas fa-laptop-code"></i>
+                        </div>
+                        <h3>Divisi Teknologi</h3>
+                        <p>Mengelola sistem informasi dan teknologi untuk kemajuan organisasi</p>
+                    </div>
+                    <div class="structure-card fade-in" data-delay="800">
+                        <div class="icon">
+                            <i class="fas fa-hands-helping"></i>
+                        </div>
+                        <h3>Divisi Sosial</h3>
+                        <p>Mengkoordinasikan program-program sosial dan bantuan kemasyarakatan</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Activities Section -->
+        <section id="activities" class="activities section">
+            <div class="container">
+                <h2 class="section-title fade-in">Kegiatan FKKP</h2>
+                <div class="activities-grid">
+                    <div class="activity-item fade-in" data-delay="100">
+                        <img src="./img/WhatsApp Image 2025-06-14 at 15.55.52_b29f8746.jpg" alt="Bakti Sosial">
+                        <div class="activity-content">
+                            <h4>Pertemuan Rapat Pertama</h4>
+                            <p>Kegiatan memilih struktur FKKP 2025</p>
+                        </div>
+                    </div>
+                    <div class="activity-item fade-in" data-delay="100">
+                        <img src="https://picsum.photos/300/200?random=11" alt="Bakti Sosial">
+                        <div class="activity-content">
+                            <h4>Bakti Sosial</h4>
+                            <p>Program bantuan untuk masyarakat kurang mampu</p>
+                        </div>
+                    </div>
+                    <div class="activity-item fade-in" data-delay="150">
+                        <img src="https://picsum.photos/300/200?random=12" alt="Olahraga Bersama">
+                        <div class="activity-content">
+                            <h4>Olahraga Bersama</h4>
+                            <p>Kegiatan olahraga rutin untuk kesehatan warga</p>
+                        </div>
+                    </div>
+                    <div class="activity-item fade-in" data-delay="200">
+                        <img src="https://picsum.photos/300/200?random=13" alt="Kajian Keagamaan">
+                        <div class="activity-content">
+                            <h4>Kajian Keagamaan</h4>
+                            <p>Diskusi dan pembelajaran nilai-nilai keagamaan</p>
+                        </div>
+                    </div>
+                    <div class="activity-item fade-in" data-delay="250">
+                        <img src="https://picsum.photos/300/200?random=14" alt="Festival Budaya">
+                        <div class="activity-content">
+                            <h4>Festival Budaya</h4>
+                            <p>Perayaan dan pelestarian budaya tradisional</p>
+                        </div>
+                    </div>
+                    <div class="activity-item fade-in" data-delay="300">
+                        <img src="https://picsum.photos/300/200?random=15" alt="Gotong Royong">
+                        <div class="activity-content">
+                            <h4>Gotong Royong</h4>
+                            <p>Kerja bakti bersama membangun lingkungan</p>
+                        </div>
+                    </div>
+                    <div class="activity-item fade-in" data-delay="350">
+                        <img src="https://picsum.photos/300/200?random=16" alt="Pelatihan Teknologi">
+                        <div class="activity-content">
+                            <h4>Pelatihan Teknologi</h4>
+                            <p>Workshop teknologi untuk meningkatkan keterampilan</p>
+                        </div>
+                    </div>
+                    <div class="activity-item fade-in" data-delay="400">
+                        <img src="https://picsum.photos/300/200?random=17" alt="Rapat Koordinasi">
+                        <div class="activity-content">
+                            <h4>Rapat Koordinasi</h4>
+                            <p>Pertemuan rutin untuk koordinasi kegiatan</p>
+                        </div>
+                    </div>
+                    <div class="activity-item fade-in" data-delay="450">
+                        <img src="https://picsum.photos/300/200?random=18" alt="Perayaan Bersama">
+                        <div class="activity-content">
+                            <h4>Perayaan Bersama</h4>
+                            <p>Acara perayaan hari-hari besar nasional</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="contact section">
+            <div class="container">
+                <h2 class="section-title fade-in">Hubungi Kami</h2>
+                <div class="contact-content">
+                    <div class="contact-info slide-left">
+                        <h3>Informasi Kontak</h3>
+                        <div class="contact-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <div>
+                                <strong>Alamat</strong><br>
+                                Jl. Kebalen Raya No. 123<br>
+                                Kebalen, Bekasi
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-phone"></i>
+                            <div>
+                                <strong>Telepon</strong><br>
+                                +62 999 - 9991 - 1234
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-envelope"></i>
+                            <div>
+                                <strong>Email</strong><br>
+                                infofkkpkebalen@gmail.com
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-clock"></i>
+                            <div>
+                                <strong>Jam Operasional</strong><br>
+                                Sabtu - Minggu: 08:00 - 17:00<br>
+                                
+                            </div>
+                        </div>
+                    </div>
+                    <div class="contact-form slide-right">
+                        <form id="contactForm">
+                            <div class="form-group">
+                                <label for="name">Nama Lengkap *</label>
+                                <input type="text" id="name" name="name" required placeholder="Masukkan nama lengkap Anda">
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email *</label>
+                                <input type="email" id="email" name="email" required placeholder="Masukkan alamat email">
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">Nomor Telepon</label>
+                                <input type="tel" id="phone" name="phone" placeholder="Masukkan nomor telepon">
+                            </div>
+                            <div class="form-group">
+                                <label for="subject">Subjek *</label>
+                                <input type="text" id="subject" name="subject" required placeholder="Subjek pesan">
+                            </div>
+                            <div class="form-group">
+                                <label for="message">Pesan *</label>
+                                <textarea id="message" name="message" required placeholder="Tuliskan pesan Anda..."></textarea>
+                            </div>
+                            <button type="submit" class="submit-btn">
+                                <i class="fas fa-paper-plane"></i> Kirim Pesan
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Forum Kerukunan Kebalen Peduli</h4>
+                    <p>Organisasi yang berkomitmen membangun kerukunan dan kepedulian masyarakat Kebalen melalui berbagai kegiatan sosial, budaya, dan keagamaan.</p>
+                    <div class="social-links">
+                        <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" title="YouTube"><i class="fab fa-youtube"></i></a>
+                        <a href="#" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4>Tautan Cepat</h4>
+                    <p><a href="#about">Tentang Kami</a></p>
+                    <p><a href="#structure">Struktur Organisasi</a></p>
+                    <p><a href="#activities">Kegiatan</a></p>
+                    <p><a href="#contact">Kontak</a></p>
+                </div>
+                <div class="footer-section">
+                    <h4>Kontak</h4>
+                    <p><i class="fas fa-map-marker-alt"></i> Jl. Kebalen Raya No. 123, Jakarta</p>
+                    <p><i class="fas fa-phone"></i> +62 21 1234 5678</p>
+                    <p><i class="fas fa-envelope"></i> info@fkkp-kebalen.org</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Forum Kerukunan Kebalen Peduli (FKKP). Semua Hak Dilindungi.</p>
+                <p>Bersama Membangun Kebalen yang Rukun dan Sejahtera</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Enhanced JavaScript for FKKP Website
+        class FKKPWebsite {
+            constructor() {
+                this.init();
+            }
+
+            init() {
+                this.setupLoadingScreen();
+                this.setupScrollProgress();
+                this.setupBackToTop();
+                this.setupMobileMenu();
+                this.setupSmoothScrolling();
+                this.setupScrollAnimations();
+                this.setupNavbarScroll();
+                this.setupForm();
+                this.setupCounters();
+                this.setupLazyLoading();
+                this.setupParallax();
+            }
+
+            // Loading Screen
+            setupLoadingScreen() {
+                window.addEventListener('load', () => {
+                    setTimeout(() => {
+                        document.getElementById('loadingScreen').classList.add('hidden');
+                    }, 1000);
+                });
+            }
+
+            // Scroll Progress Bar
+            setupScrollProgress() {
+                const progressBar = document.getElementById('scrollProgress');
+                
+                window.addEventListener('scroll', () => {
+                    const scrollTop = window.pageYOffset;
+                    const docHeight = document.body.scrollHeight - window.innerHeight;
+                    const scrollPercent = (scrollTop / docHeight) * 100;
+                    progressBar.style.width = scrollPercent + '%';
+                });
+            }
+
+            // Back to Top Button
+            setupBackToTop() {
+                const backToTop = document.getElementById('backToTop');
+                
+                window.addEventListener('scroll', () => {
+                    if (window.pageYOffset > 300) {
+                        backToTop.classList.add('visible');
+                    } else {
+                        backToTop.classList.remove('visible');
+                    }
+                });
+
+                backToTop.addEventListener('click', () => {
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                });
+            }
+
+            // Mobile Menu
+            setupMobileMenu() {
+                const hamburger = document.getElementById('hamburger');
+                const mobileMenu = document.getElementById('mobileMenu');
+                
+                hamburger.addEventListener('click', () => {
+                    hamburger.classList.toggle('active');
+                    mobileMenu.classList.toggle('active');
+                });
+
+                // Close mobile menu when clicking on links
+                const mobileLinks = mobileMenu.querySelectorAll('a');
+                mobileLinks.forEach(link => {
+                    link.addEventListener('click', () => {
+                        hamburger.classList.remove('active');
+                        mobileMenu.classList.remove('active');
+                    });
+                });
+
+                // Close mobile menu when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (!hamburger.contains(e.target) && !mobileMenu.contains(e.target)) {
+                        hamburger.classList.remove('active');
+                        mobileMenu.classList.remove('active');
+                    }
+                });
+            }
+
+            // Smooth Scrolling
+            setupSmoothScrolling() {
+                document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                    anchor.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const target = document.querySelector(anchor.getAttribute('href'));
+                        if (target) {
+                            const offsetTop = target.offsetTop - 80;
+                            window.scrollTo({
+                                top: offsetTop,
+                                behavior: 'smooth'
+                            });
+                        }
+                    });
+                });
+            }
+
+            // Scroll Animations
+            setupScrollAnimations() {
+                const observerOptions = {
+                    threshold: 0.1,
+                    rootMargin: '0px 0px -50px 0px'
+                };
+
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const delay = entry.target.dataset.delay || 0;
+                            setTimeout(() => {
+                                entry.target.classList.add('visible');
+                            }, delay);
+                        }
+                    });
+                }, observerOptions);
+
+                // Observe all animation elements
+                const animatedElements = document.querySelectorAll('.fade-in, .slide-left, .slide-right');
+                animatedElements.forEach(el => observer.observe(el));
+            }
+
+            // Navbar Scroll Effect
+            setupNavbarScroll() {
+                const navbar = document.getElementById('navbar');
+                
+                window.addEventListener('scroll', () => {
+                    if (window.scrollY > 100) {
+                        navbar.classList.add('scrolled');
+                    } else {
+                        navbar.classList.remove('scrolled');
+                    }
+                });
+            }
+
+            // Enhanced Form Handling
+            setupForm() {
+                const form = document.getElementById('contactForm');
+                const submitBtn = form.querySelector('.submit-btn');
+                
+                form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    
+                    // Show loading state
+                    const originalText = submitBtn.innerHTML;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengirim...';
+                    submitBtn.disabled = true;
+                    
+                    // Simulate form submission
+                    setTimeout(() => {
+                        const formData = new FormData(form);
+                        const name = formData.get('name');
+                        
+                        // Show success message with custom notification
+                        this.showNotification(`Terima kasih ${name}! Pesan Anda telah berhasil dikirim. Tim kami akan segera menghubungi Anda.`, 'success');
+                        
+                        // Reset form
+                        form.reset();
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                    }, 2000);
+                });
+
+                // Real-time form validation
+                const inputs = form.querySelectorAll('input, textarea');
+                inputs.forEach(input => {
+                    input.addEventListener('blur', () => this.validateField(input));
+                    input.addEventListener('input', () => this.clearFieldError(input));
+                });
+            }
+
+            // Form Validation
+            validateField(field) {
+                const value = field.value.trim();
+                const fieldName = field.name;
+                let isValid = true;
+                let errorMsg = '';
+
+                // Remove existing error
+                this.clearFieldError(field);
+
+                if (field.hasAttribute('required') && !value) {
+                    errorMsg = 'Field ini wajib diisi';
+                    isValid = false;
+                } else if (fieldName === 'email' && value) {
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(value)) {
+                        errorMsg = 'Format email tidak valid';
+                        isValid = false;
+                    }
+                } else if (fieldName === 'phone' && value) {
+                    const phoneRegex = /^[\+]?[0-9\-\(\)\s]+$/;
+                    if (!phoneRegex.test(value)) {
+                        errorMsg = 'Format nomor telepon tidak valid';
+                        isValid = false;
+                    }
+                }
+
+                if (!isValid) {
+                    this.showFieldError(field, errorMsg);
+                }
+
+                return isValid;
+            }
+
+            showFieldError(field, message) {
+                field.style.borderColor = '#e74c3c';
+                
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'field-error';
+                errorDiv.style.cssText = 'color: #e74c3c; font-size: 0.8rem; margin-top: 0.25rem;';
+                errorDiv.textContent = message;
+                
+                field.parentNode.appendChild(errorDiv);
+            }
+
+            clearFieldError(field) {
+                field.style.borderColor = 'rgba(255,255,255,0.2)';
+                const errorDiv = field.parentNode.querySelector('.field-error');
+                if (errorDiv) {
+                    errorDiv.remove();
+                }
+            }
+
+            // Enhanced Notification System
+            showNotification(message, type = 'info') {
+                const notification = document.createElement('div');
+                notification.className = `notification notification-${type}`;
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 100px;
+                    right: 20px;
+                    background: ${type === 'success' ? '#27ae60' : type === 'error' ? '#e74c3c' : '#3498db'};
+                    color: white;
+                    padding: 1rem 1.5rem;
+                    border-radius: 10px;
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+                    z-index: 10000;
+                    transform: translateX(400px);
+                    transition: transform 0.3s ease;
+                    max-width: 350px;
+                    font-weight: 500;
+                `;
+                
+                notification.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                        <span>${message}</span>
+                        <button onclick="this.parentElement.parentElement.remove()" style="background: none; border: none; color: white; font-size: 1.2rem; cursor: pointer; margin-left: auto;">&times;</button>
+                    </div>
+                `;
+                
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.style.transform = 'translateX(0)';
+                }, 100);
+                
+                setTimeout(() => {
+                    notification.style.transform = 'translateX(400px)';
+                    setTimeout(() => notification.remove(), 300);
+                }, 5000);
+            }
+
+            // Animated Counters
+            setupCounters() {
+                const counters = document.querySelectorAll('.stat-number');
+                
+                const countUp = (counter) => {
+                    const target = parseInt(counter.dataset.target);
+                    const increment = target / 100;
+                    let current = 0;
+                    
+                    const timer = setInterval(() => {
+                        current += increment;
+                        if (current >= target) {
+                            counter.textContent = target + '+';
+                            clearInterval(timer);
+                        } else {
+                            counter.textContent = Math.floor(current);
+                        }
+                    }, 20);
+                };
+
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            countUp(entry.target);
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                });
+
+                counters.forEach(counter => {
+                    observer.observe(counter);
+                });
+            }
+
+            // Lazy Loading for Images
+            setupLazyLoading() {
+                const images = document.querySelectorAll('img[src*="picsum"]');
+                
+                const imageObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const img = entry.target;
+                            img.style.opacity = '0';
+                            img.style.transition = 'opacity 0.3s ease';
+                            
+                            img.onload = () => {
+                                img.style.opacity = '1';
+                            };
+                            
+                            imageObserver.unobserve(img);
+                        }
+                    });
+                });
+
+                images.forEach(img => imageObserver.observe(img));
+            }
+
+            // Parallax Effect
+            setupParallax() {
+                window.addEventListener('scroll', () => {
+                    const scrolled = window.pageYOffset;
+                    const rate = scrolled * -0.5;
+                    
+                    const hero = document.querySelector('.hero');
+                    if (hero) {
+                        hero.style.transform = `translateY(${rate}px)`;
+                    }
+                });
+            }
+        }
+
+        // Global Functions
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // Initialize Website
+        document.addEventListener('DOMContentLoaded', () => {
+            new FKKPWebsite();
+        });
+
+        // Handle page visibility change
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                document.title = 'Kembali ke FKKP! 😊';
+            } else {
+                document.title = 'FKKP - Forum Kerukunan Kebalen Peduli';
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                // Close mobile menu if open
+                document.getElementById('hamburger').classList.remove('active');
+                document.getElementById('mobileMenu').classList.remove('active');
+            }
+            
+            if (e.ctrlKey && e.key === 'k') {
+                e.preventDefault();
+                // Focus on contact form
+                document.getElementById('name').focus();
+            }
+        });
+
+        // Performance monitoring
+        window.addEventListener('load', () => {
+            if (window.performance) {
+                const loadTime = window.performance.timing.loadEventEnd - window.performance.timing.navigationStart;
+                console.log(`Website loaded in ${loadTime}ms`);
+            }
+        });
+    </script>
+</body>
+</html>
